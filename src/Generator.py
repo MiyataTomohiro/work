@@ -1,5 +1,5 @@
 def build_generator(self):
-    """"
+    """ "
     build_generator() : 生成器(Generator)の処理(転置畳み込み)を行う関数
     入力 :  128×128×3の画像
     処理 :  転置畳み込み
@@ -12,7 +12,7 @@ def build_generator(self):
     nosie_shape = (self.z_dim,)
 
     # Sequential : モデル層を積み重ねる形式の記述方法(.addメソッドで簡単に層を追加可能)
-    model = Sequential() 
+    model = Sequential()
 
     """"
     Dense : 通常の全結合ニューラルネットワークレイヤー
@@ -72,7 +72,7 @@ def build_generator(self):
     Model() : テンソルの入出力を与え, モデルをインスタンス化
     """
 
-    model.summary() 
+    model.summary()
     noise = Input(shape=noise_shape)
     img = model(noise)
 
