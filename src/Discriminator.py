@@ -3,7 +3,11 @@ def build_discriminator(self):
     build_discriminator() : 識別器(Discriminator)の処理(畳み込み)を行う関数
     入力 :  生成器(Generator)からの生成画像(fake)とオリジナル画像(real)の2種類
     処理 :  畳み込み
-    内容 :  入力画像がfakeかrealを判別して分類
+    詳細 :  全結合層を削除
+            BatchNormalizationを頻繁に使用
+            入力画像がfakeかrealを判別して分類
+            中間層以外の活性化関数にLeakyReLU使用
+            プーリング層の代わりにstride=2の畳み込み層を使用
     """
 
     # 入力される画像の形式を格納
@@ -71,7 +75,7 @@ def build_discriminator(self):
     グラデーションで、0から1までの値を出力
     """
 
-    # 出力層
+    # 出力層(今回は2値分類であるからシグモイド関数)
     model.add(Flatten())
     model.add(Dense(units=1, activation="sigmoid"))
 
