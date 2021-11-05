@@ -7,7 +7,7 @@ def build_generator(self):
 　　        はじめのノード数は32×32×128(転置畳み込みを2回行うから)
 　　        32×32 --> 64×64 --> 128×128と画像が変化するように設定(Conv2Dのpadding='same'に注意)
 　　"""
-
+    
     # 一様乱数や正規分布から抽出した潜在変数(nosie)の次元数を指定
     nosie_shape = (self.z_dim,)
 
