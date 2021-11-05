@@ -75,8 +75,14 @@ def build_discriminator(self):
     model.add(Flatten())
     model.add(Dense(units=1, activation="sigmoid"))
 
-    model.summary()
+    """
+    model.summary() : モデルの要約を出力
+    Input() : Kerasテンソルのインスタンス化に使用
+    model() : 生成器の処理で作成したモデル
+    Model() : テンソルの入出力を与え, モデルをインスタンス化
+    """
 
+    model.summary()
     img = Input(shape=img_shape)
     validity = model(img)
 

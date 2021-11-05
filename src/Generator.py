@@ -69,7 +69,7 @@ def build_generator(self):
     model.summary() : モデルの要約を出力
     Input() : Kerasテンソルのインスタンス化に使用
     model() : 生成器の処理で作成したモデル
-    Model() : テンソルの入出力を与えて, モデルをインスタンス化
+    Model() : テンソルの入出力を与え, モデルをインスタンス化
     """
 
     model.summary() 
