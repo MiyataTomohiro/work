@@ -1,0 +1,5 @@
+# 特定のディレクトリを無視
+.vscode/
+img/
+venv/
+graduation-research/
