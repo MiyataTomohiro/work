@@ -11,7 +11,7 @@ def build_generator(self):
     # 一様乱数や正規分布から抽出した潜在変数(nosie)の次元数を指定
     nosie_shape = (self.z_dim,)
 
-    # Sequential : モデル層を積み重ねる形式の記述方法(.addメソッドで簡単に層を追加可能)
+    # Sequential() : モデル層を積み重ねる形式の記述方法(.addメソッドで簡単に層を追加可能)
     model = Sequential()
 
     """"
