@@ -83,7 +83,7 @@ def build_discriminator(self):
     model.summary() : モデルの要約を出力
     Input() : Kerasテンソルのインスタンス化に使用
     model() : 生成器の処理で作成したモデル
-    Model() : テンソルの入出力を与え, モデルをインスタンス化
+    Model() : テンソル(多次元配列)の入出力を与え, モデルをインスタンス化
     """
 
     model.summary()
