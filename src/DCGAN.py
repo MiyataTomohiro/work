@@ -76,19 +76,63 @@ class DCGAN:
         self.discriminator.trainable = False
         model = Sequential([self.generator, self.discriminator])
 
-    def train(
-        self,
-        iterations=200000,
-        batch_size=32,
-        save_interval=1000,
-        model_interval=5000,
-    ):
+    def show_imgs(self, imgs, epoch, row, col):
+        """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+        show_imgs() : 画像からなるグリッドを生成して表示(保存)する関数
+        imgs : 途中経過の画像データ
+        epoch : 現在の学習回数(画像のファイル名に使用)
+        row : 横方向(行:row)に表示する画像の枚数
+        col : 縦方向(列:colum(略:col))に表示する画像の枚数
+        """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+        """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+        fig(figure) : figure(図)インスタンスは描画全体の領域を確保
+        --> figsize: (width(幅(横)), height(高さ(縦)))のタプル
+        タプル(tuple) : 複数の要素が決まった順番に並んだ値(組)
+        axes : axes(軸)オブジェクトは実際のデータの描画の役割
+
+        plt.subplots() : fig = plt.figure()をした後、fig.add_subplot(111)した場合と同じ
+        fig = plt.figure() : Figureインスタンスを作成して描画領域の確保
+        fig.add_subplot(111) : plt.figure()にグラフを描画するためにadd_subplotメソッドを使用してsubplotを追加
+        111の意味は1行目1列の1番目
+
+        count : 表示する画像枚数をカウントして描画する画像を変化させるために使用
+        """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+        fig, axes = plt.subplots(row, col, figsize=(32, 32))
+        count = 0
+
+        """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+        for文の書き方 --> for 変数(i,jなど) in オブジェクト: 実行する処理
+        range() : 指定した回数だけ繰り返し処理を実行(例 : row = 5 --> 5回)
+        axes[i,j] : axes(配列オブジェクト)の中のi行目のj列目の要素
+        .imshow(imgs[count]) : imgs(配列オブジェクト)の中のcount番目の画像を表示
+        .axis("off") : サブプロットの軸を削除
+        count += 1 : count = count + 1(countに1を足す --> カウントアップ)
+        fig.savefig(file_path) : file_pathを指定して画像ファイルとして保存
+        plt.clf() : matplotlib 内の図全体をクリア
+        plt.close() : matplotlibの図のウィンドウを閉じる
+        """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+        for i in range(row):
+            for j in range(col):
+                # 画像グリッドを表示する
+                axes[i, j].imshow(imgs[count])
+                axes[i, j].axis("off")
+                count += 1
+        fig.savefig(f'images/test/test_{iteration}.png')
+        plt.clf()
+        plt.close()
+
+    def train(self, epoches=200000, batch_size=32, save_interval=1000, model_interval=5000, check_noise=check_noise, row=row, col=col):
         """
         train() : DCGANの生成器と識別器が学習する関数
-        epoches(エポック数) :
+        epoches(エポック数) :　学習回数(データセットをバッチサイズに従ってN個のサブセットに分け,N回学習を繰り返す)
         batch_size(バッチサイズ) : データセットをいくつかのサブセットに分けた時にに含まれるデータの数
         --> 2のn乗の値が使われることが多く, [32, 64, 128, 256, 512, 1024, 2048]などがよく使われる数値
-        save_interval :
+        save_interval : 出力画像を保存する間隔
+        model_interval　: モデルを保存する間隔
+        check_noise
+        row : 
+        col : 
 
         X_train : 学習に使用するデータセットの画像データ
         labels : 学習に使用するデータセットのラベル
@@ -107,9 +151,9 @@ class DCGAN:
             識別器の訓練(Training Generator)
             
             """ """""" """""" """""" """""" """"""
-            idx = np.random.randint(0, X_train.shape[0], half_batch)
+            index = np.random.randint(0, X_train.shape[0], half_batch)
 
-            imgs = X_train[idx]
+            imgs = X_train[index]
 
             noise = np.random.uniform(-1, 1, (half_batch, self.z_dim))
 
@@ -138,14 +182,14 @@ class DCGAN:
             )  # 生成器(Generater)の学習
 
             print(
-                "%d [D loss: %f, acc.: %.2f%%] [G loss: %f]"
+                "%d [D loss: %f, accuracy: %.2f%%] [G loss: %f]"
                 % (epoch, d_loss[0], 100 * d_loss[1], g_loss)
             )
 
             model_dir = Path("ganmodels")
             model_dir.mkdir(exist_ok=True)
             if iteration % save_interval == 0:
-                self.save_imgs(iteration, check_noise, r, c)
+                self.save_imgs(iteration, check_noise, row, col)
                 start = np.expand_dims(check_noise[0], axis=0)
                 end = np.expand_dims(check_noise[1], axis=0)
                 resultImage = self.visualizeInterpolation(start=start, end=end)
@@ -157,20 +201,20 @@ class DCGAN:
                         str(model_dir) + "/dcgan-{}-iter.h5".format(iteration)
                     )
 
-    def save_imgs(self, iteration, check_noise, r, c):
+    def save_imgs(self, iteration, check_noise, row, col):
         noise = check_noise
         gen_imgs = self.generator.predict(noise)
 
         # 0-1 rescale
         gen_imgs = 0.5 * gen_imgs + 0.5
 
-        fig, axs = plt.subplots(r, c)
-        cnt = 0
-        for i in range(r):
-            for j in range(c):
-                axs[i, j].imshow(gen_imgs[cnt, :, :, :])
+        fig, axs = plt.subplots(row, col)
+        count = 0
+        for i in range(row):
+            for j in range(col):
+                axs[i, j].imshow(gen_imgs[count, :, :, :])
                 axs[i, j].axis("off")
-                cnt += 1
+                count += 1
         fig.savefig("images/gen_imgs/kill_me_%d.png" % iteration)
 
         plt.close()
@@ -179,14 +223,14 @@ class DCGAN:
         img_paths = []
         labels = []
         images = []
-        for cl_name in self.class_names:
-            img_names = os.listdir(os.path.join(root_dir, cl_name))
+        for class_name in self.class_names:
+            img_names = os.listdir(os.path.join(root_dir, class_name))
             for img_name in img_names:
                 img_paths.append(
-                    os.path.abspath(os.path.join(root_dir, cl_name, img_name))
+                    os.path.abspath(os.path.join(root_dir, class_name, img_name))
                 )
-                hot_cl_name = self.get_class_one_hot(cl_name)
-                labels.append(hot_cl_name)
+                hot_class_name = self.get_class_one_hot(class_name)
+                labels.append(hot_class_name)
 
         for img_path in img_paths:
             img = cv2.imread(img_path)
@@ -246,6 +290,6 @@ if __name__ == "__main__":
     datarar.extractall()
 
     dcgan = DCGAN()
-    r, c = 5, 5
-    check_noise = np.random.uniform(-1, 1, (r * c, 100))
-    dcgan.train(check_noise=check_noise, r=r, c=c)
+    row, col = 5, 5
+    check_noise = np.random.uniform(-1, 1, (row * col, 100))
+    dcgan.train(epoches=200000, batch_size=32, save_interval=1000, model_interval=5000,check_noise=check_noise, row=row, col=col)
